@@ -44,7 +44,8 @@ jobs:
           git add version.txt
           git commit -m "Actualizando versión a Green"
 
-          git push origin green
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
+
 
       - name: Rollback si las pruebas fallan
         if: failure()
