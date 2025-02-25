@@ -34,7 +34,7 @@ jobs:
       - name: Promover Blue a Green (Si las pruebas son exitosas)
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch origin
           git checkout green
@@ -44,13 +44,13 @@ jobs:
           git add version.txt
           git commit -m "Actualizando versión a Green"
 
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
 
 
       - name: Rollback si las pruebas fallan
         if: failure()
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Fallo detectado. Restaurando la última versión estable de Green..."
           git fetch origin green
