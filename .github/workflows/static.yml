@@ -35,7 +35,7 @@ jobs:
           git config --global user.email "actions@github.com"
           git fetch origin
           git checkout green
-          git merge blue -m "Promoviendo la versión Blue a Green"
+          git merge origin/blue -m "Promoviendo la versión Blue a Green"
           git push origin green
 
       - name: Rollback si las pruebas fallan
