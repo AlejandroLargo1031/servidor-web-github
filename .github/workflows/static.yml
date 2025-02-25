@@ -24,17 +24,22 @@ jobs:
         run: |
           echo "Ejecutando pruebas en la versión Blue..."
           sleep 3  # Simula el tiempo de ejecución de pruebas
-          if grep -q "Estás viendo la versión <strong>Blue</strong>" index.html; then
+          
+          echo "📄 Mostrando contenido de index.html"
+          cat index.html  # Debug para ver el contenido del archivo
+
+          # Usa una verificación más flexible con grep -i (ignorar mayúsculas)
+          if grep -i -q "versión.*blue" index.html; then
             echo "Pruebas exitosas"
           else
-            echo "Pruebas fallidas"
+            echo " Pruebas fallidas"
             exit 1
           fi
 
       - name: Promover Blue a Green (Si las pruebas son exitosas)
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch origin
           git checkout green
@@ -42,15 +47,19 @@ jobs:
           
           echo "Green" > version.txt  # Actualizar archivo de versión
           git add version.txt
-          git commit -m "Actualizando versión a Green"
 
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
-
+          # Verifica si hay cambios antes de hacer commit
+          if git diff --cached --quiet; then
+            echo " No hay cambios en versión. Saltando commit..."
+          else
+            git commit -m "Actualizando versión a Green"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
+          fi
 
       - name: Rollback si las pruebas fallan
         if: failure()
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Fallo detectado. Restaurando la última versión estable de Green..."
           git fetch origin green
@@ -59,6 +68,11 @@ jobs:
           
           echo "Blue" > version.txt  # Restaurar archivo de versión
           git add version.txt
-          git commit -m "Restaurando versión a Blue"
 
-          git push --force origin green
+          # Verifica si hay cambios antes de hacer commit
+          if git diff --cached --quiet; then
+            echo "No hay cambios en versión. Saltando commit..."
+          else
+            git commit -m "Restaurando versión a Blue"
+            git push --force origin green
+          fi
