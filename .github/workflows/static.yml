@@ -48,15 +48,23 @@ jobs:
           # Modificar `index.html` para reflejar la nueva versión (maneja espacios en el HTML)
           sed -i 's/data-version="Blue"/data-version="Green"/g' index.html
 
-          # Verificar si realmente se cambió
+          # Verificar si realmente se cambió `index.html`
           if grep -q 'data-version="Green"' index.html; then
-            git add index.html
-            git commit -m "Actualizando versión a Green"
-            git push origin green
+            echo "Cambio detectado en index.html"
           else
             echo "Error: No se pudo actualizar index.html correctamente"
             exit 1
           fi
+
+          # Verificar si hay cambios en git
+          if git diff --exit-code index.html; then
+            echo "No hay cambios en index.html. Saltando commit..."
+          else
+            git add index.html
+            git commit -m "Actualizando versión a Green"
+            git push origin green
+          fi
+
 
       - name: Rollback si las pruebas fallan
         if: failure()
