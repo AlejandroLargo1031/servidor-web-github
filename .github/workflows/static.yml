@@ -15,6 +15,11 @@ jobs:
         with:
           fetch-depth: 0  # Clona todo el historial
 
+      - name: Configurar identidad de Git
+        run: |
+          git config --global user.name "alejandrolargo1031"
+          git config --global user.email "alejandropulidolargo@gmail.com"
+
       - name: Simulación de pruebas automatizadas
         run: |
           echo "Ejecutando pruebas en la versión Blue..."
@@ -31,8 +36,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git config --global user.name "alejandrolargo1031"
-          git config --global user.email "alejandropulidolargo@gmail.com"
           git fetch origin
           git checkout green
           git merge origin/blue -m "Promoviendo la versión Blue a Green"
