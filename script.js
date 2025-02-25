@@ -1,6 +1,6 @@
-const version = "Blue";  // Cambia a "Green" en el deploy
-
-function actualizarContenido() {
+document.addEventListener("DOMContentLoaded", function () {
+    const body = document.body;
+    const version = body.getAttribute("data-version"); // Leer la versión desde el atributo en el HTML
     const versionText = document.getElementById("version-text");
 
     if (version === "Green") {
@@ -10,6 +10,4 @@ function actualizarContenido() {
         versionText.innerHTML = "Estás viendo la versión <strong>Blue</strong>";
         document.body.style.backgroundColor = "#cce5ff"; // Azul claro
     }
-}
-
-actualizarContenido();
+});
