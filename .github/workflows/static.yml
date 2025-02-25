@@ -20,21 +20,19 @@ jobs:
           git config --global user.name "alejandrolargo1031"
           git config --global user.email "alejandropulidolargo@gmail.com"
 
-      - name: Simulación de pruebas automatizadas
-        run: |
-          echo "Ejecutando pruebas en la versión Blue..."
-          sleep 3  # Simula el tiempo de ejecución de pruebas
-          
-          echo "📄 Mostrando contenido de index.html"
-          cat index.html  # Debug para ver el contenido del archivo
-
-          # Usa una verificación más flexible con grep -i (ignorar mayúsculas)
-          if grep -i -q "versión.*blue" index.html; then
-            echo "Pruebas exitosas"
-          else
-            echo " Pruebas fallidas"
-            exit 1
-          fi
+          - name: Simulación de pruebas automatizadas
+          run: |
+            echo "Ejecutando pruebas en la versión Blue..."
+            sleep 3  # Simula el tiempo de ejecución de pruebas
+            
+            # Verifica si el archivo version.txt tiene la versión correcta
+            if grep -q "Blue" version.txt; then
+              echo "Pruebas exitosas"
+            else
+              echo "Pruebas fallidas"
+              exit 1
+            fi
+        
 
       - name: Promover Blue a Green (Si las pruebas son exitosas)
         if: success()
