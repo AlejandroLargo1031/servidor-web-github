@@ -1,15 +1,24 @@
+let version = "Blue";
 
-document.addEventListener("DOMContentLoaded", function () {
-    const versionIndicator = document.getElementById("version-indicator");
+fetch("version.txt")
+  .then((response) => response.text())
+  .then((data) => {
+    version = data.trim(); 
+    actualizarContenido();
+  })
+  .catch((error) => {
+    console.error("Error al obtener la versión:", error);
+    actualizarContenido(); 
+  });
 
-    // Detectar si estamos en la versión Blue o Green
-    if (window.location.href.includes("blue")) {
-        versionIndicator.textContent = "Versión: Blue";
-        document.body.style.backgroundColor = "#007BFF"; // Azul
-    } else {
-        versionIndicator.textContent = "Versión: Green";
-        document.body.style.backgroundColor = "#28A745"; // Verde
-    }
+function actualizarContenido() {
+  const versionText = document.getElementById("version-text");
 
-    console.log("Script cargado correctamente.");
-});
+  if (version === "Green") {
+    versionText.innerHTML = "Estás viendo la versión <strong>Green</strong>";
+    document.body.style.backgroundColor = "#d4edda"; // Verde claro
+  } else {
+    versionText.innerHTML = "Estás viendo la versión <strong>Blue</strong>";
+    document.body.style.backgroundColor = "#cce5ff"; // Azul claro
+  }
+}
