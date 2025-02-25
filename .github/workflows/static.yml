@@ -5,6 +5,9 @@ on:
     branches: [blue]
   workflow_dispatch:
 
+permissions:
+  contents: write  # Permite que GitHub Actions haga push
+
 jobs:
   deploy-test:
     runs-on: ubuntu-latest
@@ -18,7 +21,7 @@ jobs:
       - name: Simulación de pruebas automatizadas
         run: |
           echo "Ejecutando pruebas en la versión Blue..."
-          sleep 3  # Simula el tiempo de ejecución de pruebas
+          sleep 3  # Simula pruebas
           if grep -q "Versión Blue" index.html; then
             echo "Pruebas exitosas"
           else
@@ -29,22 +32,27 @@ jobs:
       - name: Promover Blue a Green (Si las pruebas son exitosas)
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "alejandrolargo1031"
           git config --global user.email "alejandropulidolargo@gmail.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch origin
           git checkout green
           git merge origin/blue -m "Promoviendo la versión Blue a Green"
           git push origin green
 
-      - name: Rollback si las pruebas fallan
-        if: failure()
+  rollback:
+    runs-on: ubuntu-latest
+    if: failure()  # Se activa solo si fallan las pruebas
+    steps:
+      - name: Restaurar la última versión estable de Green
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Fallo detectado. Restaurando la última versión estable de Green..."
-          git fetch origin green
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch origin
           git checkout green
           git reset --hard origin/green
-          git push --force origin green
+          git push origin green --force
