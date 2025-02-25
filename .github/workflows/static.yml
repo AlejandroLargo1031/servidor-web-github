@@ -42,10 +42,14 @@ jobs:
           
           echo "Green" > version.txt  # Actualizar archivo de versión
           git add version.txt
-          git commit -m "Actualizando versión a Green"
 
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
-
+          # Verifica si hay cambios antes de hacer commit
+          if git diff --cached --quiet; then
+            echo "No hay cambios en versión. Saltando commit..."
+          else
+            git commit -m "Actualizando versión a Green"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/AlejandroLargo1031/servidor-web-github.git green
+          fi
 
       - name: Rollback si las pruebas fallan
         if: failure()
@@ -59,6 +63,11 @@ jobs:
           
           echo "Blue" > version.txt  # Restaurar archivo de versión
           git add version.txt
-          git commit -m "Restaurando versión a Blue"
 
-          git push --force origin green
+          # Verifica si hay cambios antes de hacer commit
+          if git diff --cached --quiet; then
+            echo "No hay cambios en versión. Saltando commit..."
+          else
+            git commit -m "Restaurando versión a Blue"
+            git push --force origin green
+          fi
