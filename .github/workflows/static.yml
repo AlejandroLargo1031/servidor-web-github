@@ -20,8 +20,8 @@ jobs:
           git config --global user.name "alejandrolargo1031"
           git config --global user.email "alejandropulidolargo@gmail.com"
 
-          - name: Simulación de pruebas automatizadas
-          run: |
+      - name: Simulación de pruebas automatizadas
+        run: |
             echo "Ejecutando pruebas en la versión Blue..."
             sleep 3  # Simula el tiempo de ejecución de pruebas
             
