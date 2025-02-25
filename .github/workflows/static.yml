@@ -5,9 +5,6 @@ on:
     branches: [blue]
   workflow_dispatch:
 
-permissions:
-  contents: write  # Permite que GitHub Actions haga push
-
 jobs:
   deploy-test:
     runs-on: ubuntu-latest
@@ -21,8 +18,8 @@ jobs:
       - name: Simulación de pruebas automatizadas
         run: |
           echo "Ejecutando pruebas en la versión Blue..."
-          sleep 3  # Simula pruebas
-          if grep -q "Versión Blue" index.html; then
+          sleep 3  # Simula el tiempo de ejecución de pruebas
+          if grep -q "Estás viendo la versión <strong>Blue</strong>" index.html; then
             echo "Pruebas exitosas"
           else
             echo "Pruebas fallidas"
@@ -32,27 +29,32 @@ jobs:
       - name: Promover Blue a Green (Si las pruebas son exitosas)
         if: success()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config --global user.name "alejandrolargo1031"
           git config --global user.email "alejandropulidolargo@gmail.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch origin
           git checkout green
           git merge origin/blue -m "Promoviendo la versión Blue a Green"
+          
+          echo "Green" > version.txt  # Actualizar archivo de versión
+          git add version.txt
+          git commit -m "Actualizando versión a Green"
+
           git push origin green
 
-  rollback:
-    runs-on: ubuntu-latest
-    if: failure()  # Se activa solo si fallan las pruebas
-    steps:
-      - name: Restaurar la última versión estable de Green
+      - name: Rollback si las pruebas fallan
+        if: failure()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           echo "Fallo detectado. Restaurando la última versión estable de Green..."
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git fetch origin
+          git fetch origin green
           git checkout green
           git reset --hard origin/green
-          git push origin green --force
+          
+          echo "Blue" > version.txt  # Restaurar archivo de versión
+          git add version.txt
+          git commit -m "Restaurando versión a Blue"
+
+          git push --force origin green
