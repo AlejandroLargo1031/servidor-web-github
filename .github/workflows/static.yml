@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Clona todo el historial
+          fetch-depth: 0 # Clona todo el historial
 
       - name: Configurar identidad de Git
         run: |
@@ -29,7 +29,7 @@ jobs:
           sleep 3  # Simula el tiempo de ejecución de pruebas
 
           # Verifica si index.html contiene la versión esperada
-          if grep -q 'data-version="Blue"' index.html; then
+          if grep -q 'data-version *= *"Blue"' index.html; then
             echo "Pruebas exitosas"
           else
             echo "Pruebas fallidas"
